@@ -17,7 +17,9 @@ In this case, Nmap and View Page Source are enough !
 nmap -sCV -Pn -O <IP>
 ```
 -sCV = Script scan / Version Detection 
+
 -Pn = no ping 
+
 -O = Os detection 
 Classic mode for a pentesting 
 
