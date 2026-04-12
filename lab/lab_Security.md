@@ -2,15 +2,14 @@
 
 ## Introduction
 
-As part of my cybersecurity journey, I decided to build a personal lab to practice both Red Team and Blue Team techniques. This lab runs on a VPS hosted at OVH and uses Docker to simulate real-world attack and defense scenarios.
+As part of my cybersecurity journey, I decided to build a personal lab to practice both Red Team and Blue Team techniques. This lab runs on a VPS hosted  and uses Docker to simulate real-world attack and defense scenarios.
 
-But building a lab is not enough — securing it is just as important. A poorly secured lab exposed to the internet is a real target for attackers. In this article, I will walk you through every security decision I made, and more importantly, **why** I made it.
-
+But building a secure lab is very important . A poorly secured lab exposed to the internet is a real target, and through this process path to secure my own lab i learned a  lot , no longer theory its time to practice. 
 ---
 
 ## Part 1 — The Foundation : Choosing a VPS
 
-I chose OVH as my VPS provider for several reasons — it is a French provider, reliable, affordable, and includes built-in DDoS protection. My VPS runs **Ubuntu 22.04 LTS** — a Long Term Support release, meaning 5 years of security updates.
+I chose OVH as my VPS provider for several reasons , it is a French provider, reliable, affordable, and includes built-in DDoS protection.  As OS version i choose Ubuntu 22.04 LTS, the reason to not take the last version is for the documentation the 22.04  brought and the stability to this OS. Obviously i will need to upgrade to a newest version in a few years but i'm fine for the 5 next years due to the support. 
 
 The first thing I did after connecting for the first time was update the system :
 
@@ -18,24 +17,36 @@ The first thing I did after connecting for the first time was update the system 
 sudo apt update && sudo apt upgrade -y
 ```
 
-Never skip this step. Running outdated packages means running known vulnerabilities.
+Never skip this step. Running outdated packages means running known vulnerabilities. With a updated Packahes the only danger for me now is Zero-Day vulnerability. 
 
 ---
 
 ## Part 2 — SSH Hardening
 
-SSH is the main entry point to my server. Leaving it with default settings would be irresponsible.
+SSH is the main entry point to my server. Leaving it with default settings would be danger and easy to gain acces for a malicious attacker. I have in mind to change port , use a MFA (multi-factor authentification), create Key pair and change several options .
 
-### Why ed25519 instead of RSA ?
+### My keys pair with ed25519  ?
 
-I generated my SSH key pair using the **ed25519** algorithm instead of the traditional RSA :
+I generated my SSH key pair using the **ed25519** algorithm instead of the traditional RSA. I decided to use ed25519 because in theory this is more strong and we can considere RSA as a old cryptograpy. Still usable but ed25519 make me a better choice in this case! 
 
 ```bash
 ssh-keygen -t ed25519 -C "lab-ovh"
 ```
+his command generates two files :
+- id_ed25519   → the private key (never shared)
+- id_ed25519.pub → the public key (copied to the VPS)
 
-Ed25519 is a modern elliptic curve algorithm. It is faster, more secure, and produces shorter keys than RSA while offering equivalent or better protection.
+The private key stays on my machine. The public key is copied to the VPS using :
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub ubuntu@IP -p 2222
+```
+This adds my public key to  ~/.ssh/authorized_keys on the server.
 
+When I connect, SSH verifies that my private key matches the public key on the server without ever sending the private key over the network.
+
+I also created a backup of my private key on an encrypted USB drive. If I lose my machine, I can still access my server.
+
+So now 
 ### MFA on SSH — Two Factors to Connect
 
 I configured SSH to require **both** a private key **and** a password to connect. This is Multi-Factor Authentication applied to SSH :
@@ -51,7 +62,7 @@ PasswordAuthentication yes
 AuthenticationMethods publickey,password
 ```
 
-This means that even if an attacker steals my password, they cannot connect without the private key — and vice versa.
+This means that even if an attacker steals my password, they cannot connect without the private key  and vice versa.
 
 ### Additional SSH Hardening
 
