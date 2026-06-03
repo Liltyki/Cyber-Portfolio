@@ -108,7 +108,9 @@ I'm passionate about Blue Team operations and detection engineering  and I'm hap
 ## 📫 Get in Touch
 
 🎓 TryHackMe: https://tryhackme.com/p/LilTyki
+
 💼 LinkedIn: https://www.linkedin.com/in/yann-danhier/
+
 📧 Email : yann-dh@orange.fr
 
 ---
