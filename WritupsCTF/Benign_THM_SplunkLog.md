@@ -22,6 +22,6 @@ Marketing department
     Amelia
     Deepak
 
-### 
+### First step , and first overview.
 
 More than just answer every question like a robot i need to undsertand what's happens in these splunk logs. In this scenario i got a alert as a SOC for a potentially suspicious process execution from the HR department and one suspicious Scheduled ta
