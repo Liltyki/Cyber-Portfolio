@@ -61,10 +61,10 @@ The goal: demonstrate not only that I can solve challenges, but that I can **thi
 
 ### TryHackMe — SOC Analyst Level 1
 
-| Room | Focus | Link |
-|---|---|---|
+| Room | Focus | 
+|---|---|
 | Benign | Splunk · Threat Hunting · Windows Event ID 4688 | 
-| PickTheRick  | — | — |
+| PickTheRick  | Web Penetration | 
 
 
 
