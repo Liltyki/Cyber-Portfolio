@@ -32,7 +32,7 @@ builds our understanding of the incident.
 
 ---
 
-## 🚪 Initial Access — Malicious Document & Stage 2 Execution
+## 🚪 Initial Access — Malicious Document 
 
 The alert gives us a few pieces of information: the malicious 
 `.doc` file and the chain of commands executed by that document.
@@ -102,7 +102,79 @@ rm update.zip;
 4. **Extract archive** → unzips directly into the Startup folder
 5. **Clean up** → deletes the ZIP to reduce forensic traces
 
-> 💡 This is a classic **Startup folder persistence** technique (MITRE ATT&CK T1547.001). 
+> 💡 This is a classic **Startup folder persistence** technique (MITRE ATT&CK T1547.001).
+----
+### 🚪 Initial Access — Stage 2 Execution
+
+For this part of Tempest, I need to check different events: 
+**Event ID 1 (Process Creation)** and **Event ID 11 (File Creation)**.
+
+The room gives us a clue: **"check the child processes of 
+explorer.exe"**. This makes sense because the payload from the 
+previous stage dropped files in the Startup folder, and 
+`explorer.exe` is the Windows process that launches them at user 
+login.
+
+
+C:\Users\benimaru\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+
+
+When I filter the logs with `explorer.exe` as the parent process 
+and Event ID 1, I find this:
+
+<img width="1500" alt="explorer.exe child processes" src="https://github.com/user-attachments/assets/0743dce2-01a4-4185-bb37-0def3ec06143" />
+
+The attacker downloads `first.exe` using a PowerShell command, 
+leveraging the **`certutil` LOLBin**.
+
+To identify the C2 server, I now look at the DNS requests made 
+by the `first.exe` process (Event ID 22):
+
+<img width="400" alt="first.exe DNS queries" src="https://github.com/user-attachments/assets/1f0966b9-b8dd-4736-bcf6-87d1cf9fa110" />
+
+
+Again with all of this information i can answer every question of that stage 2.
+
+
+<img width="700"  alt="Capture d&#39;écran 2026-06-07 181436" src="https://github.com/user-attachments/assets/3b2a79ab-6ee3-4394-92dd-eb36b68f254f" />
+
+-----
+
+
+
+### 🚪 Initial Access — Malicious Document Traffic 
+
+In this section, the room wants us to analyze the packet capture 
+with **Wireshark**. Through network analysis, we can identify 
+many interesting elements: every command executed by the attacker, 
+how he connected to the C2 server, the user agent used, and more.
+
+Let's filter on the hostname `resolvecyber[.]xyz` found 
+previously. We also need to investigate `phishteam[.]xyz`, the 
+server from which the attacker downloaded the payload.
+
+<img width="700" alt="phishteam.xyz traffic" src="https://github.com/user-attachments/assets/cb0b5c6f-a5cf-43a6-a6c4-05470a7c9100" />
+
+<img width="700" alt="resolvecyber.xyz traffic" src="https://github.com/user-attachments/assets/145e32b9-66e7-44b3-9dc8-d927f9efa7ff" />
+
+With this information, we can answer several questions and 
+understand how the attacker executed his commands. **Every 
+command is encoded in Base64** ( we can easily decode them with 
+**CyberChef** or similar tools).
+
+The attacker connects to the C2 server at the URI `/9ab62b5` to 
+issue commands and execute them. Using HTTP method get and use the parameter q in the url to executed the command like in the first screenshot. 
+
+<img width="650"  alt="Capture d&#39;écran 2026-06-07 182700" src="https://github.com/user-attachments/assets/4c6418d6-fecd-439d-a8e6-2404df384191" />
+
+
+
+
+
+
+
+
+
 
 
 
