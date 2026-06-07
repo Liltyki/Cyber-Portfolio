@@ -2,7 +2,7 @@
 
 > **Platform**: TryHackMe<br>
 > **Room**: Tempest<br>
-> **Focus**: Sysmon log analysis
+> **Focus**: Sysmon and Network log analysis
 
 ---
 
