@@ -64,7 +64,7 @@ The goal: demonstrate not only that I can solve challenges, but that I can **thi
 | Room | Focus | 
 |---|---|
 | Benign | Splunk · Threat Hunting · Windows Event ID 4688 | 
-| PickTheRick  | Web Penetration | 
+| Tempest  | Sysmon - network Analysis | 
 
 
 
