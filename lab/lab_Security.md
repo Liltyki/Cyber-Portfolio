@@ -17,7 +17,7 @@ The first thing I did after connecting for the first time was update the system 
 sudo apt update && sudo apt upgrade -y
 ```
 
-Never skip this step. Running outdated packages means running known vulnerabilities. With a updated Packages the only danger for me now is Zero-Day vulnerability. 
+Never skip this step. Running outdated packages means running known, publicly documented vulnerabilities, the easiest possible win for an attacker. Patching closes that door, but it's only one layer: misconfigurations, weak credentials, vulnerable applications (my DVWA is intentionally broken), third-party packages and human error remain. A patched system isn't a safe system ! it's a system with a smaller, known attack surface.
 
 ---
 
