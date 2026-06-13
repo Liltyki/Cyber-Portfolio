@@ -76,8 +76,10 @@ Starting from a single lead — a suspicious domain — TShark alone was enough 
 
 I really enjoyed this room: I usually reach for Wireshark instead of TShark, so it was the perfect exercise to improve that skill. I'm also going to install TShark in my own lab for future simulations.
 
+----
 
 ### 📫 Get in Touch
+
 
 🎓 TryHackMe: https://tryhackme.com/p/LilTyki
 
