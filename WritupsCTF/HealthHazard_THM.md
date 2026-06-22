@@ -1,8 +1,9 @@
 # 🔍 TryHackMe — Health Hazard | Threat Hunting Write-up
 
-> **Platform:** TryHackMe
-> **Room:** Health Hazard
-> **Focus:** Splunk · Windows logs
+> **Platform:**: TryHackMe<br>
+> **Room:**: Health Hazard<br>
+> **Focus:**: Splunk · Windows logs<br>
+> 
 
 ---
 
