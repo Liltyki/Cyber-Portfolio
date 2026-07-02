@@ -151,7 +151,7 @@ First of all let's look at  the communication beetween us and files.bpakcaging.x
 We have the software used by the attacker to host its presumed file / payload server : Python the answer of the first queston ! With the Powershell command analysis we know the attacker use the binary 
 "sq3.exe" to access "plum.sqlite" who can include credentials 
 
-Lets filter with sq3.exe. The first packet is the start of the exfiltration attempt and we see the sql command used to retrieve the data frm the table "note" . I change stream to the next (750) to see what happens to the data exfiltration and let's decode the decimal encoding. 
+Lets filter with sq3.exe. The first packet is the start of the exfiltration attempt and we see the sql command used to retrieve the data frm the table "note" . I change stream to the next (750) to see what happens to the data exfiltration and let's decode the hex encoding. 
 
 
 <img width="700"  alt="Capture d&#39;écran 2026-07-02 154300" src="https://github.com/user-attachments/assets/5bbcdb40-019f-4708-b294-31b61d32d05b" /> <img width="700"  alt="image-1604-1024x473-1" src="https://github.com/user-attachments/assets/375d00db-3ab6-4ba2-b14d-4dd990764864" />
