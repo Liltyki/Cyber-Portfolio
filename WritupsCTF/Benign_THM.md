@@ -123,7 +123,7 @@ But now the investigation ends here... the Splunk data doesn't give me the oppor
 
 
 
-### What i understand in the siuation §
+### What i understand in the siuation ?
 
 An attacker gained access to the HR department and used lateral 
 movement to reach Chris and Haroon. With Haroon, he downloaded a 
