@@ -64,6 +64,8 @@ phpMyAdmin is a free PHP tool for administering MySQL. For the next two question
 
 The final question — *"What flag does the attacker insert into the database using import.php?"* : is the attacker's actual goal ! what does he want to inject? Filtering on `import.php` and bingo! He inserts a row into the **`credit_cards`** table.
 
+<img width="640" height="734" alt="Capture d&#39;écran 2026-07-17 193815" src="https://github.com/user-attachments/assets/d7799a7e-6ab5-45b0-b265-0e055251ace0" />
+
 ---
 
 ## 🔗 Kill Chain
