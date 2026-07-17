@@ -1,7 +1,9 @@
 # 🔍 TryHackMe — Slingshot | SOC Investigation Writeup
 
 > **Platform:** TryHackMe
+> 
 > **Room:** Slingshot
+> 
 > **Focus:** Elastic Stack log analysis
 
 ---
