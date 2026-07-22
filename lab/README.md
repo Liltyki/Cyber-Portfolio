@@ -30,10 +30,10 @@ At the time of writing, my objectives for this lab are:
         |
 [VPS OVH - Ubuntu 22.04]
         |
-   +---------+----------+----------+
-   |         |          |          |
-[Kali]   [Target]   [DVWA]   [Wireshark]
-.10       .20         .30       .40
+   +---------+----------+
+   |         |          |          
+[Kali]   [Target]   [DVWA]   
+.10       .20         .30       
         Docker Internal Network
         192.168.100.0/24
 ```
