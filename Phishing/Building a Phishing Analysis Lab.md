@@ -11,11 +11,6 @@ I've done that kind of analysis before on TryHackMe rooms, but always on samples
 
 That meant building something. This is how I did it, and what broke along the way.
 
-## Scope
-
-Everything here runs on my own VPS. The recipients are fictitious mailboxes I control, on `.test` domains, which [RFC 2606](https://www.rfc-editor.org/rfc/rfc2606) reserves and guarantees will never resolve. Messages are captured locally and never leave the machine.
-
-No third party is ever a recipient. Gophish is used the way companies use it — as an awareness and detection tool, inside a defined scope.
 
 ## What was already there
 
