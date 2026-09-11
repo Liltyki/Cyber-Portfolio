@@ -1,11 +1,11 @@
-## 🔍 Analysing a Phishing Email
+# 🔍 Analysing a Phishing Email
 
 As I said in article 1, I used my own home lab to create a phishing campaign and analyse the resulting emails. I asked an AI assistant to generate realistic phishing content  the first one being the classic "you need to reset your password". 
 
 ## The Scenarios 
 
 Working from a scenario is more engaging than analysing raw email data. Let me introduce ChocoCompany, the world's leading chocolate manufacturer. Their accounting department has just alerted the security team about two suspicious emails.
-The two memeber of the account team received that mail .
+The two member of the account team received that mail .
 
 
 <img width="400" height="400" alt="Capture d&#39;écran 2026-09-11 185829" src="https://github.com/user-attachments/assets/a41d733b-cbd8-47f9-90e5-f11e5071e386" />
@@ -24,8 +24,8 @@ Both are answered in the logs, not in the Email
 ## 👀 First impressions
 
 
-The email look like a legitimate renew password from chococompagny.com. They target john and Fiona from accountable branch and they come from a mail who look legitimate. This is a spear phising, 
-a phishing compagn to target chococompagny, the content look exactly like a real mail from chococompagny, the sender mail look like a real mail from it-support@choco.com and they know John and Fiona informations (email , name ...) 
+The email look like a legitimate  password renewal from chococompagny.com. They target john and Fiona from accountable branch and it comes from a mail address that looks legitimate. This is a spear phising:
+A phishing compagn to target chococompagny, the content look exactly like a real mail from ChocoCompagny, the sender's address  look like a real mail from it-support@choco.com and they know John and Fiona's informations (email , name ...) 
 
 To determine if the mail is suspicious or not  i need to analysis header ! 
 
@@ -43,7 +43,7 @@ Return-Path : it-support@choco.com
 From : it-support@сh0co.com
 
 As a member of chococompagny i know the email from IT-support is : it-support@choco.com. But as i see the mail come from it-support@ch0co.com . The attacker change the o to a 0 to deceive the victim. 
-But sometime that not obvious like that, and the human's eye can't make the difference like a c in latin alphabet and a c in cyrilic alphabet. hexdump will help us to determine if the 2 email match.
+But sometimes it is not  as obvious as that, and the human's eye cannot spot the difference beetween a'c' in latin alphabet and a 'c' in cyrilic alphabet. hexdump will help us to determine if the 2 email match.
 
 <img width="640" height="100" alt="Capture d&#39;écran 2026-09-11 192444" src="https://github.com/user-attachments/assets/35915eef-25bd-480d-8a97-bb369ec679d4" />
 
