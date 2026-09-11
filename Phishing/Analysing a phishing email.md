@@ -1,16 +1,16 @@
 # 🔍 Analysing a Phishing Email
 
-As I said in article 1, I used my own home lab to create a phishing campaign and analyse the resulting emails. I asked an AI assistant to generate realistic phishing content  the first one being the classic "you need to reset your password". 
+As I said in article 1, I used my own home lab to create a phishing campaign and analyse the resulting emails. I asked an AI assistant to generate realistic phishing content, the first one being the classic "you need to reset your password". 
 
 ## The Scenarios 
 
 Working from a scenario is more engaging than analysing raw email data. Let me introduce ChocoCompany, the world's leading chocolate manufacturer. Their accounting department has just alerted the security team about two suspicious emails.
-The two member of the account team received that mail .
+The two members of the accounting team received that mail.
 
 
 <img width="400" height="400" alt="Capture d&#39;écran 2026-09-11 185829" src="https://github.com/user-attachments/assets/a41d733b-cbd8-47f9-90e5-f11e5071e386" />
 
-ChocoCompany is fortunate to have employees trained to recognise phishing attempts. Analysising a suspicious email   answer first :is this actually malicious ? who send it, and what were they after ? It also producers IOCs that can be reused later.
+ChocoCompany is fortunate to have employees trained to recognise phishing attempts. Analysing a suspicious email answers first :is this actually malicious ? who sent it, and what were they after ? It also producers IOCs that can be reused later.
 
 This article focuses on the email analysis itself. But a SOC analyst doesn't stop at closing the ticket, other questions remain open and neither can be answered from the message alone:
 
