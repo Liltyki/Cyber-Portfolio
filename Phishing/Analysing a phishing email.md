@@ -10,7 +10,7 @@ The two members of the accounting team received that mail.
 
 <img width="400" height="400" alt="Capture d&#39;écran 2026-09-11 185829" src="https://github.com/user-attachments/assets/a41d733b-cbd8-47f9-90e5-f11e5071e386" />
 
-ChocoCompany is fortunate to have employees trained to recognise phishing attempts. Analysing a suspicious email answers first :is this actually malicious ? who sent it, and what were they after ? It also producers IOCs that can be reused later.
+ChocoCompany is fortunate to have employees trained to recognise phishing attempts. Analysing a suspicious email answers first :is this actually malicious ? who sent it, and what were they after ? It also produces IOCs that can be reused later.
 
 This article focuses on the email analysis itself. But a SOC analyst doesn't stop at closing the ticket, other questions remain open and neither can be answered from the message alone:
 
@@ -24,16 +24,16 @@ Both are answered in the logs, not in the Email
 ## 👀 First impressions
 
 
-The email look like a legitimate  password renewal from chococompagny.com. They target john and Fiona from accountable branch and it comes from a mail address that looks legitimate. This is a spear phising:
-A phishing compagn to target chococompagny, the content look exactly like a real mail from ChocoCompagny, the sender's address  look like a real mail from it-support@choco.com and they know John and Fiona's informations (email , name ...) 
+The email looks like a legitimate  password renewal from chococompany.com. They target john and Fiona from accounting department and it comes from a mail address that looks legitimate. This is a spear phishing:
+A phishing compaign to target chococompany, the content look exactly like a real mail from ChocoCompagny, the sender's address  look like a real mail from it-support@choco.com and they know John and Fiona's informations (email , name ...) 
 
-To determine if the mail is suspicious or not  i need to analysis header ! 
+To determine if the mail is suspicious or not  I need to analyse header ! 
 
 
  ## 📬 Header analysis
 
-To analysis email's header i will user mxtoolbox.com , i will copy the ENL content to the tools and i will gain more informations thant the simple view of the mail. This scenario is build in my lab so i design this campaign to not be reach by internet . 
-So DMARC DKIM and SPF will not be analysis here but in a future article.
+To analysis email's header I will use mxtoolbox.com , i will copy the EML content to the tools and i will gain more information than the simple view of the mail. This scenario is build in my lab so i design this campaign to not be reached by internet . 
+So DMARC DKIM and SPF will not be analysed here but in a future article.
 
 <img width="400" height="400" alt="Capture d&#39;écran 2026-09-11 191807" src="https://github.com/user-attachments/assets/e2e31f36-ebce-4510-a6d0-124e51094824" />
 
@@ -42,7 +42,7 @@ Ok the return-Path and the sender are suspicious. They are different :
 Return-Path : it-support@choco.com
 From : it-support@сh0co.com
 
-As a member of chococompagny i know the email from IT-support is : it-support@choco.com. But as i see the mail come from it-support@ch0co.com . The attacker change the o to a 0 to deceive the victim. 
+As a member of chococompany i know the email from IT-support is : it-support@choco.com. But as i see the mail comes from it-support@ch0co.com . The attacker change the o to a 0 to deceive the victim. 
 But sometimes it is not  as obvious as that, and the human's eye cannot spot the difference beetween a'c' in latin alphabet and a 'c' in cyrilic alphabet. hexdump will help us to determine if the 2 email match.
 
 <img width="640" height="100" alt="Capture d&#39;écran 2026-09-11 192444" src="https://github.com/user-attachments/assets/35915eef-25bd-480d-8a97-bb369ec679d4" />
@@ -52,9 +52,9 @@ The first character is 0xd1 0x81 -> UTF-8 for U+0441, Cyrillic small letter ES  
 
 This is a homoglyph attack (T1583.001). The displayed domain is not the one being used.
 
-The difference beetween the Return-PATH and the from are not efficient. Most of compagny can have a different return-path for centralized their answer etc.
+The difference between the Return-PATH and the From is not efficient. Most of companies can have a different return-path to centralize their answers etc.
 
-They are no attachment to analysis so its time to chehck the body.
+They are no attachments to analyse so it's time to check the body.
 
 ## ✉️ The message body
 
