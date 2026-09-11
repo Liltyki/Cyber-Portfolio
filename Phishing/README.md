@@ -53,13 +53,13 @@ Using a mail sink instead of a real mail server was the other deliberate choice.
  
 The analysis in this project follows a consistent structure, which I apply to any reported email:
  
-**1. Headers — what the message actually is**
+**1. Headers**
 Comparing `From` against `Return-Path` and `Envelope-From` to surface spoofing. Reading the `Received:` chain bottom-up to reconstruct the real delivery path. Checking `Authentication-Results` for SPF, DKIM and DMARC verdicts. Looking at `Message-ID` consistency and `X-Mailer` for tooling clues.
  
-**2. Body — the psychological lever**
+**2. Body **
 Identifying the pretext: urgency, authority, fear, or curiosity. This matters less for detection than for awareness training, but it shapes the recommendation.
  
-**3. URLs and attachments — without ever clicking**
+**3. URLs and attachments **
 Extracting links, comparing displayed text against the real target, and analysing destinations through sandboxed services rather than a browser.
  
 **4. IOC extraction**
