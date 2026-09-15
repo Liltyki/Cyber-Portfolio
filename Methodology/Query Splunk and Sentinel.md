@@ -1,36 +1,12 @@
 # From Alert to Query — Splunk (SPL) & Sentinel (KQL) for 20 Alert Types
 
-> **Draft — make it yours.** Rewrite the intro and conclusion in your own voice, and run the whole thing through a spell-checker before publishing. Keep the honesty note below. Delete this line when you're done.
-
 ## Introduction
 
-In my previous article, [*How to Determine a True or False Positive?*](#), I shared the **method** I use to start an investigation — the 5 W, the triage, and correlation. But a method needs tooling. Once I know *where* to look, I still need to know *how* to ask the question.
-
-This second article is the tooling side of that playbook: for each of the 20 alert types, a query in **SPL** (Splunk) and its equivalent in **KQL** (Microsoft Sentinel / Defender).
-
-> **Honesty note:** these queries are **templates I built while learning**, not production-tested searches. Field names, `sourcetypes` and table names must be adapted to your own environment. I'm currently deploying Wazuh in my home lab to test this kind of logic against real data.
-
-## SPL vs KQL — two languages, one logic
-
-Splunk and Sentinel are two of the most common SIEM platforms, and they use different query languages. The good news: once you understand the *logic*, switching between them is mostly a matter of syntax.
-
-Both work as a **pipeline** — you start from a data source and pass the results through successive transformations. The comparison that helped me the most:
-
-| Goal | Splunk (SPL) | Sentinel (KQL) |
-|---|---|---|
-| Pipe / chain steps | `\|` | `\|` |
-| Filter | `search` / `where` | `where` |
-| Count / group | `stats count by field` | `summarize count() by field` |
-| Distinct count | `dc(field)` | `dcount(field)` |
-| Create a field | `eval x=...` | `extend x=...` |
-| Select columns | `table a, b` | `project a, b` |
-| Sort | `sort -field` | `sort by field desc` |
-
-So `stats count by src_ip \| where count > 20` in SPL becomes `summarize count() by SourceIP \| where count_ > 20` in KQL. Same idea, different words.
+In my previous article, [*How to Start an investigation.md*](#), I shared the **method** I use to start an investigation, the 5 W, the triage, and correlation. This second article is the tooling side of that playbook: for each of the 20 alert types, a query in **SPL** (Splunk) and its equivalent in **KQL** (Microsoft Sentinel / Defender). I often use Splunk, i decided to add KQL (sentinel) with IA for future investigation if i have to work with sentinel in a future.
 
 ## Three queries, explained
 
-Before dumping the full table, here are three queries broken down — because copying a query is easy; understanding *why* it works is the actual skill.
+Before dumping the full table, here are three queries broken down, because copying a query is easy; understanding *why* it works is the actual skill.
 
 ### 1 — Repeated failed SSH logins (brute force)
 
@@ -42,21 +18,11 @@ index=linux sourcetype=linux_secure "Failed password"
 | sort -count
 ```
 
-- `index=linux sourcetype=linux_secure "Failed password"` — pull only Linux auth events that contain a failed password.
-- `stats count by src_ip, user` — group them: how many failures per source IP and per targeted user?
-- `where count > 20` — keep only the noisy ones (a handful of failures is normal; 20+ is suspicious).
-- `sort -count` — worst offenders first.
+- `index=linux sourcetype=linux_secure "Failed password"` —> pull only Linux auth events that contain a failed password.
+- `stats count by src_ip, user` —> group them: how many failures per source IP and per targeted user?
+- `where count > 20` —> keep only the noisy ones (a handful of failures is normal; 20+ is suspicious).
+- `sort -count` —> worst offenders first.
 
-**KQL:**
-```kql
-Syslog
-| where SyslogMessage has "Failed password"
-| extend src = extract("from ([0-9.]+)", 1, SyslogMessage)
-| summarize Attempts = count() by src, HostName
-| where Attempts > 20
-```
-
-Same logic: filter the failures, extract the source IP from the raw message, group and count, keep the loud ones.
 
 ### 2 — PowerShell with an encoded command
 
@@ -67,7 +33,7 @@ index=windows (EventCode=4688 OR EventCode=4104)
 | table _time, host, User, ParentImage, CommandLine
 ```
 
-Here the key is not just *finding* the encoded PowerShell, but showing the **`ParentImage`** — what launched it. PowerShell launched by a script is normal; PowerShell launched by `winword.exe` is not.
+Here the key is not just *finding* the encoded PowerShell, but showing the `ParentImage` what launched it. PowerShell launched by a script is normal; PowerShell launched by `winword.exe` is not.
 
 ### 3 — Port scan
 
@@ -79,7 +45,7 @@ index=firewall action=blocked
 | sort -ports
 ```
 
-The trick is `dc(dest_port)` — a **distinct count** of destination ports per source IP. One IP touching 100+ different ports in a short window is the signature of a scan, not normal traffic.
+The trick is `dc(dest_port)` a **distinct count** of destination ports per source IP. One IP touching 100+ different ports in a short window is the signature of a scan, not normal traffic.
 
 ## The 20 alert types — SPL & KQL
 
@@ -331,19 +297,17 @@ DnsEvents
 
 ## How to adapt these to your environment
 
-None of these will work by copy-paste — and that's normal. Before running any of them, check:
+None of these will work by copy-paste  and that's normal. Before running any of them, check:
 
-- **Index / source names.** `index=windows` on my notes might be `index=wineventlog` on your instance. List what you have first.
-- **Field names.** `src_ip`, `EventCode`, `dest_port` depend on how your data is parsed (CIM in Splunk, the schema of each table in Sentinel).
-- **Thresholds.** `count > 20`, `ports > 100` are starting points, not truths. Tune them to your baseline to reduce false positives.
-
-The value isn't in the exact query — it's in knowing *which question* each one answers.
+- Index / source names. `index=windows` on my notes might be `index=wineventlog` on other instance. 
+- Field names. `src_ip`, `EventCode`, `dest_port` depend on how your data is parsed (CIM in Splunk, the schema of each table in Sentinel).
+- Thresholds. `count > 20`, `ports > 100` are starting points, not truths. Tune them to your baseline to reduce false positives.
 
 ## Conclusion
 
-A method tells you *where* to look; these queries are *how* you ask. Together with the previous article, this is the small playbook I keep on my desk to move faster without skipping steps.
+A method tells you where to look; these queries are how you ask. Together with the previous article, this is the small playbook I keep on my desk to move faster without skipping steps.
 
-Next step for me: run these against real data. I'm deploying Wazuh in my home lab to centralize logs from Linux, web applications, and a Windows endpoint — so I can replace "template" with "tested."
+Next step for me: run these against real data. I'm deploying Wazuh in my home lab to centralize logs from Linux, web applications, and a Windows endpoint  so I can replace "template" with "tested."
 
 ## 📫 Connect
 
