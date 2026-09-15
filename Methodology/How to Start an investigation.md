@@ -1,4 +1,4 @@
-# How to determine a true or false positive ? A soc  analyst's starting point
+# How to star an investigation after an alert  ? A soc  analyst's starting point
 
 ## Introduction 
 
