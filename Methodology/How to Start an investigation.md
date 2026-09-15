@@ -2,40 +2,46 @@
 
 ## Introduction 
 
-When i started learning SOC analyst role; i had no idea how to start a investigation.When we learn cybersecurity we don't have a company playbook, we are alone inf ront of the desk.  I learn tools, theory, improve my skill but when i started a tryhackmeroom i was like "Ok i have no idea how to start". After a few research i made a little playbook on my desk to help me memorize everything i needed. 
 
-A Soc Analyst has to decided whether an alert is a false positive or true positive, but the challenge is to stay fast and rigorous. Answering what ? where? when? who ? why? quickly enough to keepuo without rushing so much that a real threat slips through. That balance is exactly why haven method matters/
+When I started learning the SOC analyst role, I had no idea how to start an investigation. When you learn cybersecurity on your own, you don't have a company playbook. You are alone in front of the desk. I learned the tools, the theory, I improved my skills, but the first time I started a TryHackMe room I thought: "OK, I have no idea how to start." After some research, I built a little playbook on my desk to help me memorize everything I needed.
+ 
+A SOC analyst has to decide whether an alert is a false positive or a true positive, and the challenge is to stay fast and rigorous: answering *What? Where? When? Who? Why?* quickly enough to keep up, without rushing so much that a real threat slips through. That balance is exactly why having a method matters.
+
+
 
 
 ## The 5 w and the triage 
 
-Before trying to go through windows logs, or network logs or whatever, we context about the alert. As i said more earlier answer the 5 w give us the contact :
+Before going through Windows logs, network logs, or whatever the source is, I need context about the alert. As I said earlier, answering the 5 W gives me that context:
 
-- What ? Which rule fire, and what exactly does it detect ?
-- where ? which hosts and Ips are involves ? 
-- when ? what isd the timeline ?
+- What ? Which rule fired, and what exactly does it detect ?
+- where ? which hosts and Ips are involved ? 
+- when ? what is the timeline ?
 - Who ? which user or account is involved ?
 - Why ? is this a true or false ? or benign activity ?
+  
+This context should give me enough information to decide whether the alert is a true or false positive, and whether it needs to be escalated or closed.
 
-This context and information should give us enought information to decided if the alert is true or false , and if he needed to be escalate or close. 
-
-Also method is what protect a soc analyst from tiredness, a soc analyst can see thousand alert per day. And after a feww hundred he become tired and less effective. That why build our own little playbook early in the career help. 
+A method is also what protects a SOC analyst from fatigue. An analyst can face thousands of alerts per day, and after a few hundred, tiredness sets in and effectiveness drops. That's why building your own little playbook early in your career helps.
 
 
 ## The LOLbins : 
 
 Sometime its easy and very fast to determine if the alert is a true positive or not. Like if a powershell is launch by an excel or contains -enc or IEX in the queries that most of the time a True positive. Understand LOLBins for windows and linux will increase the soc efficiente. Lot of time an attacker will use LOLbins (living off the land Binaries) to avoid anti-virus. A corect set of rule and the behavior user is the keys to alert these kind of exploit. 
 
+Sometimes it's easy and fast to determine whether an alert is a true positive. For example, if PowerShell is launched by Excel, or contains `-enc` or `IEX` in the command line, it's a true positive most of the time. Understanding LOLBins on Windows and Linux increases a SOC analyst's efficiency. Attackers often use LOLBins (Living Off the Land Binaries) to evade antivirus. A correct set of rules combined with user-behavior context is the key to catching this kind of activity.
+
 
 ## Into the logs : 
 
-A single alert rarely tells a story, the real work is correlation. To understand what is behind the alert we need to correlate difference source. Take a exemple : Its 9AM during work schedule. The server get 5 SSH logins failed. From a unknow IP. These can be a remote employee who forget to connect through the VPN or an attacker who try to brute force the SSH logins. To determine which case is it we need to correlate differente informations and source.
 
-- Check the Ip reputation and origin
-- Chech the user's history : Does an employee useually work at this time ? and any employee is in remote ?
-- Analyze the attempt pattern : 5 failed attempts followed by a sucessful login ? 5 failed attempts on 50 different account ?
+A single alert rarely tells a story, the real work is correlation. To understand what is behind an alert, we need to correlate different sources. Take an example: it's 9 AM, during working hours. A server gets 5 failed SSH logins from an unknown IP. This could be a remote employee who forgot to connect through the VPN, or an attacker trying to brute-force SSH. To determine which one it is, we need to correlate different pieces of information and sources:
 
-Everything is answer whith more information we pickup in logs. As i said earlier a few months ago  the first time i investigate an alert, i was like "Ok, i know i need to check that network logs , that syslog but how ? what the query ? what's the start ? " That why i made a table. To enhance the process and answer faster. 
+- Check the IP reputation and origin.
+- Check the user's history: does this employee usually work at this time? Is anyone working remotely?
+- Analyze the attempt pattern: 5 failed attempts followed by a successful login? Or 5 failed attempts across 50 different accounts?
+
+Every question is answered with more information we pick up in the logs. As I said earlier, a few months ago, the first time I investigated an alert, I thought: *"OK, I know I need to check the network logs, the syslog... but how? What's the query? Where do I start?"* That's why I made a table to enhance the process and answer faster.
 
 ## The 20 alert types :
  
@@ -68,12 +74,12 @@ For each: the alert, the logs to check first,and  where to start.
 In the next article i will share a table with SQL queriess associate with each Alert type.
 ## Conclusion 
 
-As a junior , created our own "playbook " give the opportunity to pratctie in a certains way the tons of informations we learn. And structured our think. These patterns help me to answer the alert life time :
 
-Read the alert → check the right logs → decide true/false positive → scope → escalate or close
-
-Next step for me: apply this on my own SIEM. I am currently deploying Wazuh in my home lab to centralize logs from Linux, web applications and a Windows endpoint — so I can replay these scenarios against real data and turn this framework from theory into practice.
-
+As a junior, creating your own playbook is a way to practice the tons of information we learn, and to structure your thinking. This pattern helps me work through the life cycle of an alert:
+ 
+**Read the alert → check the right logs → decide true/false positive → scope → escalate or close**
+ 
+Next step for me: apply this on my own SIEM. I am currently deploying Wazuh in my home lab to centralize logs from Linux, web applications, and a Windows endpoint. So I can replay these scenarios against real data and turn this framework from theory into practice.
 
 
 ## 📫 Connect
