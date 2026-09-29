@@ -27,8 +27,6 @@ A method is also what protects a SOC analyst from fatigue. An analyst can face t
 
 ## The LOLbins : 
 
-Sometime its easy and very fast to determine if the alert is a true positive or not. Like if a powershell is launch by an excel or contains -enc or IEX in the queries that most of the time a True positive. Understand LOLBins for windows and linux will increase the soc efficiente. Lot of time an attacker will use LOLbins (living off the land Binaries) to avoid anti-virus. A corect set of rule and the behavior user is the keys to alert these kind of exploit. 
-
 Sometimes it's easy and fast to determine whether an alert is a true positive. For example, if PowerShell is launched by Excel, or contains `-enc` or `IEX` in the command line, it's a true positive most of the time. Understanding LOLBins on Windows and Linux increases a SOC analyst's efficiency. Attackers often use LOLBins (Living Off the Land Binaries) to evade antivirus. A correct set of rules combined with user-behavior context is the key to catching this kind of activity.
 
 
