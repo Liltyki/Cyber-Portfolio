@@ -1,116 +1,89 @@
 # 👋 Hey, I'm Yann Danhier
 
-> 🎯 **Aspiring SOC Analyst**  In career transition since December 2025<br>
-> 🛡️ Focused on **Blue Team / SOC operations**  Threat Hunting, Incident Response, SIEM<br>
-> 📍 Based in France · Open to opportunities
+> 🛡️ **Junior SOC Analyst** · Blue Team · CompTIA Security+
+
+> 📍 Based in Lille, France · Open to opportunities across Europe · Available now
 
 ---
 
-## 🚀 About this Portfolio
 
-This repository documents my journey into cybersecurity  from the first room on TryHackMe to building my own home lab.<br>
-You'll find here **writeups, lab projects, and detection engineering experiments**.
+I moved into cybersecurity in December 2025, and I learn by building. This portfolio documents that work: a home lab I designed and secured myself, a full phishing analysis project, my own investigation methodology, and write-ups from hands-on investigations.
 
-The goal: demonstrate not only that I can solve challenges, but that I can **think like a real SOC analyst**  investigating, documenting, and recommending actions.
+The goal isn't to show that I can solve challenges. It's to show that I can think like a SOC analyst: investigate, separate what the evidence proves from what it suggests, document, and recommend.
 
 ---
 
-## 🎓 Background
+## 📂 What's in this portfolio
 
-- 🔄 **Career transition** started December 2025
-- 📜 Completed **Security+** course by Andrew Ramdayal (Udemy)
-- 🏆 TryHackMe paths completed:
-  - **Pre-Security**
-  - **Cyber Security 101** (SEC1 certified)
-  - **Jr Penetration Tester**
-  - **Web Fundamentals**
-  - **SOC Analyst Level 1** 
-- 🎯 Upcoming certifications:
-  - **Splunk Core Certified User** — June 2026
-  - **CompTIA Security+** — June 2026
-  - **CompTIA CySA+** — July/August 2026
+| Section | What you'll find |
+| :--- | :--- |
+| 🎣 [**Phishing**](Phishing/) | A complete project: building an isolated phishing lab, then analysing the emails like a reported incident (header analysis, homoglyph domain confirmed at byte level, IOCs, MITRE mapping) |
+| 🧭 [**Methodology**](Methodology/) | My own playbooks: how I start an investigation (5 W's, triage, correlation, 20 alert types) and the matching SPL / KQL queries |
+| 🔬 [**Lab**](Lab/) | How I built and hardened my home lab, and the security decisions behind it |
+| 📝 [**Write-ups**](Writeups/) | TryHackMe investigations rebuilding full attack chains, each mapped to MITRE ATT&CK |
 
 ---
 
-## 🛠️ Skills & Tools
+## 🔬 Home lab
 
-**SIEM & Log Analysis**
-- Splunk · SPL queries · Threat hunting · Statistical anomaly detection
+A self-managed VPS (OVH), designed so that **nothing is exposed publicly**.
 
-**Network Analysis**
-- Wireshark · tcpdump · Snort IDS/IPS · BPF filters · PCAP investigation
+- Hardened SSH: key-based authentication, non-standard port, Fail2ban, UFW
+- WireGuard VPN as the only way in, with every service bound to the VPN interface
+- Docker for service isolation
+- Gophish + Mailpit for phishing simulation and telemetry generation
+- DVWA and a Kali container for attack/defence scenarios
+- 🔄 SIEM deployment in progress, to centralise logs and run detection scenarios
 
-**Endpoint Detection**
-- Windows Event Logs (4624, 4625, 4688, 4698, 4720...) · Sysmon · Auditd · Process tree analysis
-
-**Threat Intelligence**
-- MITRE ATT&CK · VirusTotal · AbuseIPDB · ThreatFox · Shodan · IOC enrichment · RDAP / WHOIS
-
-**Malware Analysis (Basic)**
-- PEStudio · Strings · CyberChef · Static analysis · IOC extraction
-
-**Linux & Windows Internals**
-- Linux administration · Auditd rule writing · PowerShell · LOLBins detection
-
-**Web & Offensive Basics**
-- OWASP Top 10 fundamentals · Web application testing · Burp Suite basics
+One lesson from building it: **Docker bypasses UFW**. Published container ports are handled before UFW's rules, so firewall rules on those ports are silently ignored. Binding services to the right interface was the reliable fix. It's documented in the [Lab](Lab/) and [Phishing](Phishing/) sections.
 
 ---
 
-## 📚 Writeups
+## 📝 Featured write-ups
 
-### TryHackMe — SOC Analyst Level 1
-
-| Room | Focus | 
-|---|---|
-| Benign | Splunk · Threat Hunting · Windows Event ID 4688 | 
-| Tempest  | Sysmon - network Analysis | 
-
-
-
----
-
-## 🧪 Home Lab
-
-> Personal lab built on a self-managed VPS (OVH) — used to practice detection engineering on a real-world setup exposed to the Internet.
-
-**Architecture**
-- VPS with hardened SSH (key auth, fail2ban, UFW)
-- Splunk Free instance for log centralization
-- Auditd configured for syscall monitoring
-- *Honeypot deployment planned (Cowrie SSH)*
-
-**Goals**
-- Generate real attack telemetry from internet exposure
-- Practice writing Sigma detection rules
-- Document IOCs collected from real brute-force attempts
-
-📂 [See lab documentation](./lab/README.md) 
+| Investigation | Focus |
+| :--- | :--- |
+| **Analysing a Phishing Email** | Header analysis, Cyrillic homoglyph sender domain, IOC extraction |
+| **Slingshot** | Web server compromise in Elastic: recon, brute force, web shell, LFI, database tampering |
+| **Tempest** | Full incident response chain, PrintSpoofer privilege escalation, persistence |
+| **Benign** | Splunk, Windows Event ID 4688, LOLBin detection |
+| **Boogeyman** | Phishing, network and PowerShell history analysis |
+| **Health Hazard** | Malicious package, encoded PowerShell, persistence |
 
 ---
 
-## 📖 Currently Learning
+## 🛠️ Skills & tools
 
-- 🟢 Splunk fundamentals (preparing for Splunk Core Certified User)
-- 🟢 Security+ exam preparation
-- 🟢 Threat Intelligence and IOC enrichment workflows
-- 🟢 Detection engineering with Sigma rules
-
----
-
-## 🎯 What I'm Looking For
-
-I'm actively preparing for a **junior SOC Analyst (L1)** position starting **mid of 2026**, after my Splunk, Security+ and CySA+ certifications.<br>
-I'm passionate about Blue Team operations and detection engineering  and I'm happy to discuss any opportunity.
+| Domain | Tools | What I do with them |
+| :--- | :--- | :--- |
+| **SIEM & detection** | Splunk · Elastic | SPL and Kibana queries, alert triage, log analysis, threat hunting |
+| **Endpoint** | Windows Event Logs · Sysmon | Event IDs 4624, 4625, 4688, 4698, 4720, process tree analysis, LOLBins |
+| **Network** | Wireshark · tcpdump · TShark | PCAP investigation, traffic analysis, IOC extraction |
+| **Email** | MXToolbox · hexdump | Header analysis, sender spoofing, homoglyph detection, phishing triage |
+| **Threat intelligence** | MITRE ATT&CK · VirusTotal · urlscan.io · CyberChef | MITRE mapping, IOC enrichment, URL and domain reputation |
+| **Infrastructure** | Linux · Docker · WireGuard · UFW · Fail2ban · Bash | Server hardening, service isolation, VPN segmentation |
+| **Offensive basics** | Kali · Nmap · Burp Suite · Gophish | Reproducing attacks to understand what I need to detect |
 
 ---
 
-## 📫 Get in Touch
+## 🎓 Certifications & training
 
-🎓 TryHackMe: https://tryhackme.com/p/LilTyki
-
-💼 LinkedIn: https://www.linkedin.com/in/yann-danhier/
-
-📧 Email : yann-dh@orange.fr
+- ✅ **CompTIA Security+** · July 2026
+- 🔄 **CompTIA CySA+** · exam scheduled November 2026
+- ✅ **TryHackMe SEC1** (Cyber Security 101)
+- ✅ TryHackMe paths: SOC Level 1 · Jr Penetration Tester · Web Fundamentals · Pre-Security
+- 🔄 TryHackMe SOC Level 2 · in progress
 
 ---
+
+## 🎯 What I'm looking for
+
+My first **SOC Analyst (L1)** role. I'm comfortable with 24/7 shift work, including nights and weekends, after nearly four years managing a retail store on early, late and weekend shifts. I'm available immediately, on-site, and ready to relocate across Europe.
+
+---
+
+## 📫 Get in touch
+
+📧 yann-dh@orange.fr
+💼 [LinkedIn](https://www.linkedin.com/in/yann-danhier/)
+🎓 [TryHackMe](https://tryhackme.com/p/LilTyki)
